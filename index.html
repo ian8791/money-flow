@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow</title>
+    <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+    <script>
+      const currentUser = JSON.parse(localStorage.getItem('moneyflow_current_user') || 'null');
+      if (currentUser) {
+        window.location.href = 'pages/dashboard.html';
+      } else {
+        window.location.href = 'pages/login.html';
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

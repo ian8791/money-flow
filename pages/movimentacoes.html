@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow | Movimentações</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">MF</div>
+          <div class="brand-text">MoneyFlow</div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-link active"><span class="icon">📊</span>MoneyFlow</a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-mini">
+            <div class="avatar" data-user-initials>U</div>
+            <div>
+              <strong data-user-name>Usuário</strong>
+              <small>Conta ativa</small>
+            </div>
+          </div>
+          <button class="secondary-btn" data-action="logout" style="width:100%;">Sair</button>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <div class="topbar">
+          <div>
+            <h1 class="page-title">Movimentações</h1>
+          </div>
+
+          <div class="topbar-actions">
+            <button class="theme-toggle" data-theme-toggle aria-label="Alternar tema">☀️</button>
+          </div>
+        </div>
+
+        <div class="page-header-card">
+          <div>
+            <h2>Gerencie suas entradas e saídas</h2>
+            <div class="summary-mini">Controle financeiro por movimentações</div>
+          </div>
+        </div>
+
+        <div class="tool-grid">
+          <section class="content-card form-panel">
+            <div class="card-header">
+              <h3 id="transactionTitle">Nova movimentação</h3>
+            </div>
+
+            <form id="transactionForm" novalidate>
+              <input type="hidden" id="transactionId" />
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="transactionType">Tipo</label>
+                  <select id="transactionType">
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionDescription">Descrição</label>
+                  <input id="transactionDescription" type="text" placeholder="Ex.: Salário, mercado, aluguel" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionValue">Valor</label>
+                  <input id="transactionValue" type="number" min="0.01" step="0.01" placeholder="0,00" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionCategory">Categoria</label>
+                  <select id="transactionCategory" required> </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionDate">Data</label>
+                  <input id="transactionDate" type="date" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="transactionPayment">Forma de pagamento</label>
+                  <select id="transactionPayment" required>
+                    <option value="">Selecione</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Cartão de crédito">Cartão de crédito</option>
+                    <option value="Cartão de débito">Cartão de débito</option>
+                    <option value="Transferência">Transferência</option>
+                    <option value="Pix">Pix</option>
+                    <option value="Boleto">Boleto</option>
+                  </select>
+                </div>
+
+                <div class="form-group full">
+                  <label for="transactionNotes">Observações</label>
+                  <textarea id="transactionNotes" rows="3" placeholder="Detalhes extras da movimentação"></textarea>
+                </div>
+              </div>
+
+              <div class="form-panel-actions">
+                <div class="form-actions">
+                  <button type="submit" class="primary-btn"><span id="transactionSubmitText">Adicionar movimentação</span></button>
+                  <button type="button" class="secondary-btn hidden" id="cancelEditTransaction">Cancelar</button>
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <section class="content-card">
+            <div class="card-header">
+              <h3>Resumo financeiro</h3>
+            </div>
+            <div class="total-box" style="margin-bottom: 12px;">
+              <span>Receitas</span>
+              <strong id="sideIncomeTotal">R$ 0,00</strong>
+            </div>
+            <div class="total-box expense" style="margin-bottom: 12px;">
+              <span>Despesas</span>
+              <strong id="sideExpenseTotal">R$ 0,00</strong>
+            </div>
+            <div class="total-box" style="background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.2);">
+              <span>Saldo</span>
+              <strong id="sideBalanceTotal">R$ 0,00</strong>
+            </div>
+          </section>
+        </div>
+
+        <section class="content-card">
+          <div class="list-header">
+            <h3 class="section-title">Lista de movimentações</h3>
+          </div>
+
+          <div class="filters-panel">
+            <div class="form-group">
+              <label for="searchInput">Buscar</label>
+              <input id="searchInput" type="text" placeholder="Descrição" />
+            </div>
+
+            <div class="form-group">
+              <label for="typeFilter">Tipo</label>
+              <select id="typeFilter">
+                <option value="all">Todos</option>
+                <option value="income">Receita</option>
+                <option value="expense">Despesa</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryFilter">Categoria</label>
+              <select id="categoryFilter"></select>
+            </div>
+
+            <div class="form-group">
+              <label for="periodFilter">Período</label>
+              <input id="periodFilter" type="month" />
+            </div>
+
+            <div class="form-group">
+              <label for="sortSelect">Ordenar por</label>
+              <select id="sortSelect">
+                <option value="date-desc">Data mais recente</option>
+                <option value="date-asc">Data mais antiga</option>
+                <option value="value-desc">Maior valor</option>
+                <option value="value-asc">Menor valor</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="align-self:flex-end;">
+              <button type="button" class="secondary-btn" id="resetFilters">Limpar filtros</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                  <th>Data</th>
+                  <th>Pagamento</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/transactions.js"></script>
+  </body>
+</html>

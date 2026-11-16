@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow | Categorias</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">MF</div>
+          <div class="brand-text">MoneyFlow</div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-link active"><span class="icon">📊</span>MoneyFlow</a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-mini">
+            <div class="avatar" data-user-initials>U</div>
+            <div>
+              <strong data-user-name>Usuário</strong>
+              <small>Conta ativa</small>
+            </div>
+          </div>
+          <button class="secondary-btn" data-action="logout" style="width:100%;">Sair</button>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <div class="topbar">
+          <div>
+            <h1 class="page-title">Categorias</h1>
+          </div>
+
+          <div class="topbar-actions">
+            <button class="theme-toggle" data-theme-toggle aria-label="Alternar tema">☀️</button>
+          </div>
+        </div>
+
+        <div class="page-header-card">
+          <div>
+            <h2>Organize suas categorias</h2>
+            <div class="summary-mini">Crie, edite e mantenha seus grupos financeiros</div>
+          </div>
+        </div>
+
+        <div class="tool-grid">
+          <section class="content-card form-panel">
+            <div class="card-header">
+              <h3 id="categoryTitle">Nova categoria</h3>
+            </div>
+
+            <form id="categoryForm" novalidate>
+              <input type="hidden" id="categoryId" />
+
+              <div class="form-group">
+                <label for="categoryName">Nome da categoria</label>
+                <input id="categoryName" type="text" placeholder="Ex.: Salário, Mercado, Transporte" required />
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="categoryType">Tipo</label>
+                  <select id="categoryType">
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="categoryIcon">Ícone</label>
+                  <input id="categoryIcon" type="text" value="💼" placeholder="💼" />
+                </div>
+
+                <div class="form-group full">
+                  <label for="categoryColor">Cor</label>
+                  <input id="categoryColor" type="color" value="#16c784" />
+                </div>
+              </div>
+
+              <div class="form-actions" style="margin-top:18px;">
+                <button type="submit" class="primary-btn"><span id="categorySubmitText">Adicionar categoria</span></button>
+                <button type="button" class="secondary-btn hidden" id="cancelEditCategory">Cancelar</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="content-card">
+            <div class="card-header">
+              <h3>Categorias cadastradas</h3>
+            </div>
+            <div id="categoryList" class="category-list"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/categories.js"></script>
+  </body>
+</html>
