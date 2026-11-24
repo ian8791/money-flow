@@ -211,6 +211,145 @@
   border-radius: 50%;
 }
 
+.report-period-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.report-period-control input {
+  max-width: 170px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--text);
+}
+
+.profile-settings {
+  display: grid;
+  gap: 18px;
+  max-width: 680px;
+}
+
+.profile-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.profile-preview .avatar {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.profile-color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.profile-color-option {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.profile-color-option[aria-pressed="true"] {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.goal-list,
+.tip-list {
+  display: grid;
+  gap: 16px;
+}
+
+.goal-card,
+.tip-card {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.goal-card-header,
+.goal-values,
+.goal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-values {
+  flex-wrap: wrap;
+  margin: 14px 0 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.goal-progress {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.goal-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--profile-accent);
+  transition: width 0.25s ease;
+}
+
+.goal-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.tip-card h3 {
+  margin: 0 0 8px;
+}
+
+.tip-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.converter-result {
+  min-height: 78px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-alt);
+}
+
+.converter-result strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.5rem;
+}
+
+.inline-form-actions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
 @media (max-width: 768px) {
   .tool-grid,
   .content-grid,
@@ -231,5 +370,9 @@
   .panel-card {
     padding-left: 18px;
     padding-right: 18px;
+  }
+
+  .goal-card-header {
+    align-items: flex-start;
   }
 }

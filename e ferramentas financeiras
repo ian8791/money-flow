@@ -1,0 +1,18 @@
+ README.md             |  66 [32m+++++++++++++[m[31m--[m
+ css/dashboard.css     | 143 [32m++++++++++++++++++++++++++++++++[m
+ css/responsive.css    |   2 [32m+[m
+ css/style.css         |  46 [32m++++++++++[m[31m-[m
+ js/app.js             | 212 [32m+++++++++++++++++++++++++++++++++++++++++++++[m[31m--[m
+ js/currency.js        |  85 [32m+++++++++++++++++++[m
+ js/dashboard.js       |  72 [32m+++++++[m[31m---------[m
+ js/goals.js           | 225 [32m++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ js/profile.js         |  55 [32m++++++++++++[m
+ js/reports.js         |  69 [32m++++++++++++++[m[31m--[m
+ js/storage.js         |  64 [32m+++++++++++++[m[31m-[m
+ js/tips.js            |  81 [32m++++++++++++++++++[m
+ pages/conversor.html  |  45 [32m++++++++++[m
+ pages/dicas.html      |  32 [32m+++++++[m
+ pages/metas.html      |  57 [32m+++++++++++++[m
+ pages/perfil.html     |  58 [32m+++++++++++++[m
+ pages/relatorios.html |  18 [32m+++[m[31m-[m
+ 17 files changed, 1264 insertions(+), 66 deletions(-)

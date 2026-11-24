@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initCommonUi() {
+  applyProfileAccent();
+  initFeatureNavigation();
+
   const themeToggleButton = document.querySelector('[data-theme-toggle]');
   if (themeToggleButton) {
     themeToggleButton.addEventListener('click', () => {
@@ -70,11 +73,53 @@ function initCommonUi() {
   const page = window.location.pathname.split('/').pop() || 'index.html';
   const navLinks = document.querySelectorAll('.nav-link');
   navLinks.forEach((link) => {
+    link.classList.remove('active');
     const href = link.getAttribute('href');
     if (href && href.includes(page)) {
       link.classList.add('active');
     }
   });
+}
+
+function initFeatureNavigation() {
+  const nav = document.querySelector('.sidebar-nav');
+  if (!nav) {
+    return;
+  }
+
+  const links = [
+    ['dashboard.html', '📊', 'Dashboard'],
+    ['movimentacoes.html', '🧾', 'Movimentações'],
+    ['categorias.html', '🏷️', 'Categorias'],
+    ['relatorios.html', '📈', 'Relatórios'],
+    ['perfil.html', '👤', 'Perfil'],
+    ['metas.html', '🎯', 'Metas'],
+    ['dicas.html', '💡', 'Dicas de economia'],
+    ['conversor.html', '💱', 'Conversor']
+  ];
+
+  links.forEach(([href, icon, label]) => {
+    if (nav.querySelector(`a[href="${href}"]`)) {
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = href;
+    link.className = 'nav-link';
+    link.innerHTML = `<span class="icon">${icon}</span>${label}`;
+    nav.appendChild(link);
+  });
+}
+
+function applyProfileAccent() {
+  const profile = getUserProfile();
+  const accent = profile?.accent || '#38bdf8';
+  const red = parseInt(accent.slice(1, 3), 16);
+  const green = parseInt(accent.slice(3, 5), 16);
+  const blue = parseInt(accent.slice(5, 7), 16);
+
+  document.body.style.setProperty('--profile-accent', accent);
+  document.body.style.setProperty('--profile-accent-soft', `rgba(${red}, ${green}, ${blue}, 0.16)`);
 }
 
 function applyTheme(theme) {
@@ -141,6 +186,36 @@ function getCategoryById(categoryId) {
   return categories.find((category) => category.id === categoryId) || null;
 }
 
+function getExpenseCategoryTotals(period = '') {
+  const categories = getCategories().filter((category) => category.type === 'expense');
+  const transactions = getTransactions().filter((transaction) =>
+    transaction.type === 'expense' && (!period || transaction.date.startsWith(period))
+  );
+  const totals = new Map(categories.map((category) => [category.id, {
+    id: category.id,
+    name: category.name,
+    color: category.color || '#94a3b8',
+    value: 0,
+    transactions: 0
+  }]));
+
+  transactions.forEach((transaction) => {
+    const category = totals.get(transaction.categoryId);
+    if (category) {
+      category.value += Number(transaction.value || 0);
+      category.transactions += 1;
+    }
+  });
+
+  const result = [...totals.values()].filter((item) => item.value > 0).sort((a, b) => b.value - a.value);
+  const total = result.reduce((sum, item) => sum + item.value, 0);
+
+  return result.map((item) => ({
+    ...item,
+    percentage: total ? (item.value / total) * 100 : 0
+  }));
+}
+
 function getFinancialSummary() {
   const transactions = getTransactions();
 
@@ -203,16 +278,82 @@ function renderSimpleLegend(items) {
   items.forEach((item) => {
     const legendItem = document.createElement('div');
     legendItem.className = 'legend-item';
-    legendItem.innerHTML = `<span class="legend-dot" style="background:${item.color};"></span>${item.label}`;
+    const dot = document.createElement('span');
+    dot.className = 'legend-dot';
+    dot.style.background = item.color;
+
+    const label = document.createElement('span');
+    label.textContent = item.label;
+    legendItem.append(dot, label);
     legend.appendChild(legendItem);
   });
 
   return legend;
 }
 
+function bindChartDetails(canvas, logicalWidth, logicalHeight, resolveDetails) {
+  if (!canvas) {
+    return;
+  }
+
+  const wrapper = canvas.parentElement;
+  let tooltip = wrapper.querySelector('.chart-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.className = 'chart-tooltip';
+    tooltip.setAttribute('role', 'status');
+    tooltip.setAttribute('aria-live', 'polite');
+    wrapper.appendChild(tooltip);
+  }
+  canvas.tabIndex = 0;
+  let pinned = false;
+
+  const updateTooltip = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const point = {
+      x: (event.clientX - rect.left) * logicalWidth / rect.width,
+      y: (event.clientY - rect.top) * logicalHeight / rect.height
+    };
+    const details = resolveDetails(point);
+
+    if (!details) {
+      tooltip.classList.remove('is-visible');
+      return;
+    }
+
+    tooltip.textContent = details.join('\n');
+    tooltip.classList.add('is-visible');
+  };
+
+  canvas.onpointermove = (event) => {
+    if (!pinned) {
+      updateTooltip(event);
+    }
+  };
+  canvas.onclick = (event) => {
+    pinned = !pinned;
+    if (pinned) {
+      updateTooltip(event);
+    } else {
+      tooltip.classList.remove('is-visible');
+    }
+  };
+  canvas.onpointerleave = () => {
+    if (!pinned) {
+      tooltip.classList.remove('is-visible');
+    }
+  };
+  canvas.onkeydown = (event) => {
+    if (event.key === 'Escape') {
+      pinned = false;
+      tooltip.classList.remove('is-visible');
+    }
+  };
+}
+
 function buildBarChart(canvasId, labels, values, colors) {
   const canvas = document.getElementById(canvasId);
-  if (!canvas) {
+  if (!canvas || !labels.length) {
     return;
   }
 
@@ -256,9 +397,24 @@ function buildBarChart(canvasId, labels, values, colors) {
     ctx.textAlign = 'center';
     ctx.fillText(label, x + barWidth / 2, height - 12);
   });
+
+  const totalMagnitude = values.reduce((sum, value) => sum + Math.abs(value), 0);
+  bindChartDetails(canvas, width, height, ({ x, y }) => {
+    if (x < padding.left || x > width - padding.right || y < padding.top || y > height - padding.bottom) {
+      return null;
+    }
+
+    const index = Math.floor((x - padding.left) / (chartWidth / labels.length));
+    if (index < 0 || index >= labels.length) {
+      return null;
+    }
+
+    const share = totalMagnitude ? Math.abs(values[index]) / totalMagnitude * 100 : 0;
+    return [labels[index], `Saldo: ${formatCurrency(values[index])}`, `${share.toFixed(1)}% do saldo absoluto exibido`];
+  });
 }
 
-function buildLineChart(canvasId, labels, incomeValues, expenseValues) {
+function buildLineChart(canvasId, labels, incomeValues, expenseValues, detailLabels = labels) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) {
     return;
@@ -319,6 +475,22 @@ function buildLineChart(canvasId, labels, incomeValues, expenseValues) {
     ctx.textAlign = 'center';
     ctx.fillText(label, x, height - 8);
   });
+
+  bindChartDetails(canvas, width, height, ({ x, y }) => {
+    if (x < padding.left || x > width - padding.right || y < padding.top || y > height - padding.bottom || !labels.length) {
+      return null;
+    }
+
+    const index = Math.round((x - padding.left) / chartWidth * Math.max(labels.length - 1, 0));
+    const monthlyTotal = Number(incomeValues[index] || 0) + Number(expenseValues[index] || 0);
+    const incomeShare = monthlyTotal ? Number(incomeValues[index] || 0) / monthlyTotal * 100 : 0;
+    return [
+      detailLabels[index] || labels[index],
+      `Receitas: ${formatCurrency(incomeValues[index])}`,
+      `Despesas: ${formatCurrency(expenseValues[index])}`,
+      `${incomeShare.toFixed(1)}% das movimentações do mês são receitas`
+    ];
+  });
 }
 
 function buildDonutChart(canvasId, segments) {
@@ -336,11 +508,12 @@ function buildDonutChart(canvasId, segments) {
   ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, size, size);
 
-  const total = segments.reduce((sum, segment) => sum + segment.value, 0) || 1;
+  const total = segments.reduce((sum, segment) => sum + segment.value, 0);
+  const denominator = total || 1;
   let startAngle = -Math.PI / 2;
 
   segments.forEach((segment) => {
-    const slice = (segment.value / total) * Math.PI * 2;
+    const slice = (segment.value / denominator) * Math.PI * 2;
     const endAngle = startAngle + slice;
 
     ctx.beginPath();
@@ -365,4 +538,33 @@ function buildDonutChart(canvasId, segments) {
   ctx.font = '12px sans-serif';
   ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--muted').trim();
   ctx.fillText(formatCurrency(total), size / 2, size / 2 + 18);
+
+  bindChartDetails(canvas, size, size, ({ x, y }) => {
+    const deltaX = x - size / 2;
+    const deltaY = y - size / 2;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (distance < 42 || distance > radius || !segments.length) {
+      return null;
+    }
+
+    let angle = Math.atan2(deltaY, deltaX) + Math.PI / 2;
+    if (angle < 0) {
+      angle += Math.PI * 2;
+    }
+
+    let currentAngle = 0;
+    const segment = segments.find((item) => {
+      const slice = (item.value / total) * Math.PI * 2;
+      const matches = angle >= currentAngle && angle <= currentAngle + slice;
+      currentAngle += slice;
+      return matches;
+    });
+
+    if (!segment) {
+      return null;
+    }
+
+    const percentage = segment.value / denominator * 100;
+    return [segment.label || 'Categoria', formatCurrency(segment.value), `${percentage.toFixed(1)}% das despesas exibidas`];
+  });
 }

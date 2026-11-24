@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+window.addEventListener('moneyflow:data-changed', initDashboardPage);
+window.addEventListener('storage', (event) => {
+  if ([STORAGE_KEYS.transactions, STORAGE_KEYS.categories].includes(event.key)) {
+    initDashboardPage();
+  }
+});
+
 function initDashboardPage() {
   const summary = getFinancialSummary();
   const currentDate = new Date();
@@ -23,25 +30,25 @@ function initDashboardPage() {
   const incomeSeries = summary.monthMap.length ? summary.monthMap.map((item) => item.income) : [0, 0, 0];
   const expenseSeries = summary.monthMap.length ? summary.monthMap.map((item) => item.expense) : [0, 0, 0];
 
-  buildLineChart('incomeExpenseChart', monthLabels.slice(-6), incomeSeries.slice(-6), expenseSeries.slice(-6));
+  const monthDetails = summary.monthMap.slice(-6).map((item) => getMonthlyName(item.month));
+  buildLineChart('incomeExpenseChart', monthLabels.slice(-6), incomeSeries.slice(-6), expenseSeries.slice(-6), monthDetails);
 
-  const categoryTotals = getExpenseCategoryTotals();
-  if (categoryTotals.length) {
-    buildDonutChart('categoryChart', categoryTotals.map((item) => ({
-      value: item.value,
-      color: item.color
-    })));
+  const categoryTotals = getExpenseCategoryTotals().slice(0, 5);
+  buildDonutChart('categoryChart', categoryTotals.map((item) => ({
+    label: item.name,
+    value: item.value,
+    color: item.color
+  })));
 
-    const legend = renderSimpleLegend(categoryTotals.map((item) => ({
-      label: item.name,
-      color: item.color
-    })));
-    const chartCard = document.getElementById('categoryChart').closest('.panel-card');
-    if (chartCard) {
-      const existingLegend = chartCard.querySelector('.legend');
-      if (existingLegend) existingLegend.remove();
-      chartCard.appendChild(legend);
-    }
+  const legend = renderSimpleLegend(categoryTotals.map((item) => ({
+    label: `${item.name} (${item.percentage.toFixed(1)}%)`,
+    color: item.color
+  })));
+  const chartCard = document.getElementById('categoryChart').closest('.panel-card');
+  if (chartCard) {
+    const existingLegend = chartCard.querySelector('.legend');
+    if (existingLegend) existingLegend.remove();
+    chartCard.appendChild(legend);
   }
 
   renderRecentTransactions(summary.recentTransactions);
@@ -125,25 +132,8 @@ function renderMonthlySummary(months) {
   container.innerHTML = cards;
 }
 
-function getExpenseCategoryTotals() {
-  const categories = getCategories();
-  const transactions = getTransactions();
-  const totals = {};
-
-  categories
-    .filter((category) => category.type === 'expense')
-    .forEach((category) => {
-      totals[category.id] = { name: category.name, color: category.color || '#94a3b8', value: 0 };
-    });
-
-  transactions
-    .filter((transaction) => transaction.type === 'expense')
-    .forEach((transaction) => {
-      const category = transaction.categoryId && totals[transaction.categoryId];
-      if (category) {
-        category.value += Number(transaction.value || 0);
-      }
-    });
-
-  return Object.values(totals).filter((item) => item.value > 0).sort((a, b) => b.value - a.value).slice(0, 5);
-}
+window.addEventListener('resize', () => {
+  if (document.getElementById('dashboardSummary')) {
+    initDashboardPage();
+  }
+});

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow | Conversor de moedas</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-badge">MF</div><div class="brand-text">MoneyFlow</div></div>
+        <nav class="sidebar-nav"><a href="dashboard.html" class="nav-link"><span class="icon">📊</span>Dashboard</a></nav>
+        <div class="sidebar-footer">
+          <div class="user-mini"><div class="avatar" data-user-initials>U</div><div><strong data-user-name>Usuário</strong><small>Conta ativa</small></div></div>
+          <button class="secondary-btn" data-action="logout" style="width:100%;">Sair</button>
+        </div>
+      </aside>
+      <main class="main-panel">
+        <div class="topbar"><h1 class="page-title">Conversor de moedas</h1><div class="topbar-actions"><button class="theme-toggle" data-theme-toggle aria-label="Alternar tema">☀️</button></div></div>
+        <div class="page-header-card"><div><h2>Consulte uma conversão estimada</h2><div class="summary-mini">As taxas de referência são consultadas online; é necessária conexão com a internet.</div></div></div>
+        <section class="content-card" style="max-width:820px;">
+          <form id="currencyForm" novalidate>
+            <div class="form-grid">
+              <div class="form-group full"><label for="currencyAmount">Valor</label><input id="currencyAmount" type="number" min="0.01" step="0.01" value="1" required /></div>
+              <div class="form-group"><label for="currencyFrom">Moeda de origem</label><select id="currencyFrom"><option value="BRL">BRL — Real brasileiro</option><option value="USD">USD — Dólar americano</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Libra esterlina</option><option value="CAD">CAD — Dólar canadense</option><option value="AUD">AUD — Dólar australiano</option><option value="CHF">CHF — Franco suíço</option><option value="JPY">JPY — Iene japonês</option><option value="MXN">MXN — Peso mexicano</option><option value="ARS">ARS — Peso argentino</option></select></div>
+              <div class="form-group"><label for="currencyTo">Moeda de destino</label><select id="currencyTo"><option value="USD">USD — Dólar americano</option><option value="BRL">BRL — Real brasileiro</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Libra esterlina</option><option value="CAD">CAD — Dólar canadense</option><option value="AUD">AUD — Dólar australiano</option><option value="CHF">CHF — Franco suíço</option><option value="JPY">JPY — Iene japonês</option><option value="MXN">MXN — Peso mexicano</option><option value="ARS">ARS — Peso argentino</option></select></div>
+            </div>
+            <div class="form-actions"><button class="primary-btn" id="convertCurrency" type="submit">Converter</button><button class="secondary-btn" id="reverseCurrencies" type="button" aria-label="Inverter moedas">Inverter</button><button class="secondary-btn" id="retryCurrency" type="button">Tentar novamente</button></div>
+          </form>
+          <div class="converter-result" aria-live="polite" style="margin-top:22px;"><span>Resultado estimado</span><strong id="currencyResult">Aguardando conversão</strong></div>
+          <p id="currencyRate" class="summary-mini" style="margin-top:16px;"></p>
+          <p id="currencyUpdatedAt" class="inline-note"></p>
+          <p id="currencyStatus" class="inline-note">Fonte: Frankfurter (frankfurter.dev). Taxas de referência, não cotações finais de bancos ou casas de câmbio.</p>
+        </section>
+      </main>
+    </div>
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/currency.js"></script>
+  </body>
+</html>

@@ -35,7 +35,7 @@
       <main class="main-panel">
         <div class="topbar">
           <div>
-            <h1 class="page-title">Relatórios</h1>
+            <h1 class="page-title" id="reportTitle">Relatórios</h1>
           </div>
 
           <div class="topbar-actions">
@@ -76,8 +76,24 @@
           <section class="chart-card">
             <div class="card-header">
               <h3>Despesas por categoria</h3>
+              <label class="report-period-control" for="reportCategoryPeriod">
+                <span>Período</span>
+                <input id="reportCategoryPeriod" type="month" />
+              </label>
             </div>
             <div class="chart-wrap" style="height:260px;"><canvas id="reportCategoryChart" height="260"></canvas></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Total gasto</th>
+                    <th>Participação</th>
+                  </tr>
+                </thead>
+                <tbody id="reportCategoryTableBody"></tbody>
+              </table>
+            </div>
           </section>
         </div>
 

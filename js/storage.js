@@ -3,7 +3,9 @@ const STORAGE_KEYS = {
   currentUser: 'moneyflow_current_user',
   transactions: 'moneyflow_transactions',
   categories: 'moneyflow_categories',
-  theme: 'moneyflow_theme'
+  theme: 'moneyflow_theme',
+  profiles: 'moneyflow_profiles',
+  goals: 'moneyflow_goals'
 };
 
 function saveData(key, value) {
@@ -46,6 +48,12 @@ function saveUsers(users) {
   saveData(STORAGE_KEYS.users, users);
 }
 
+function notifyFinancialDataChanged() {
+  if (typeof window !== 'undefined' && typeof CustomEvent !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('moneyflow:data-changed'));
+  }
+}
+
 function getTransactions() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
@@ -65,6 +73,7 @@ function saveTransactions(items) {
   const filteredTransactions = allTransactions.filter((item) => item.userId !== currentUser.id);
   const normalizedItems = items.map((item) => ({ ...item, userId: currentUser.id }));
   saveData(STORAGE_KEYS.transactions, [...filteredTransactions, ...normalizedItems]);
+  notifyFinancialDataChanged();
   return normalizedItems;
 }
 
@@ -88,6 +97,7 @@ function saveCategories(items) {
   const normalizedItems = items.map((item) => ({ ...item, userId: currentUser.id }));
 
   saveData(STORAGE_KEYS.categories, [...filteredCategories, ...normalizedItems]);
+  notifyFinancialDataChanged();
   return normalizedItems;
 }
 
@@ -97,6 +107,58 @@ function getStoredTheme() {
 
 function setStoredTheme(theme) {
   saveData(STORAGE_KEYS.theme, theme);
+}
+
+function getUserProfile() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return null;
+  }
+
+  const profile = readData(STORAGE_KEYS.profiles, []).find((item) => item.userId === currentUser.id);
+  const accent = profile?.accent;
+
+  return {
+    userId: currentUser.id,
+    accent: typeof accent === 'string' && /^#[0-9a-f]{6}$/i.test(accent) ? accent : '#38bdf8'
+  };
+}
+
+function saveUserProfile(profile) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return null;
+  }
+
+  const profiles = readData(STORAGE_KEYS.profiles, []).filter((item) => item.userId !== currentUser.id);
+  const accent = typeof profile.accent === 'string' && /^#[0-9a-f]{6}$/i.test(profile.accent)
+    ? profile.accent
+    : '#38bdf8';
+  const updatedProfile = { userId: currentUser.id, accent };
+
+  saveData(STORAGE_KEYS.profiles, [...profiles, updatedProfile]);
+  return updatedProfile;
+}
+
+function getGoals() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return [];
+  }
+
+  return readData(STORAGE_KEYS.goals, []).filter((goal) => goal.userId === currentUser.id);
+}
+
+function saveGoals(goals) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return [];
+  }
+
+  const allGoals = readData(STORAGE_KEYS.goals, []).filter((goal) => goal.userId !== currentUser.id);
+  const userGoals = goals.map((goal) => ({ ...goal, userId: currentUser.id }));
+  saveData(STORAGE_KEYS.goals, [...allGoals, ...userGoals]);
+  return userGoals;
 }
 
 const defaultCategories = {

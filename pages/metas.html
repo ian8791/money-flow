@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow | Metas</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-badge">MF</div><div class="brand-text">MoneyFlow</div></div>
+        <nav class="sidebar-nav"><a href="dashboard.html" class="nav-link"><span class="icon">📊</span>Dashboard</a></nav>
+        <div class="sidebar-footer">
+          <div class="user-mini"><div class="avatar" data-user-initials>U</div><div><strong data-user-name>Usuário</strong><small>Conta ativa</small></div></div>
+          <button class="secondary-btn" data-action="logout" style="width:100%;">Sair</button>
+        </div>
+      </aside>
+      <main class="main-panel">
+        <div class="topbar"><h1 class="page-title">Metas e caixinhas</h1><div class="topbar-actions"><button class="theme-toggle" data-theme-toggle aria-label="Alternar tema">☀️</button></div></div>
+        <div class="page-header-card"><div><h2>Guarde para seus objetivos</h2><div class="summary-mini">Valores reservados são controles internos; não movimentam uma conta bancária.</div></div></div>
+        <div class="tool-grid">
+          <section class="content-card form-panel">
+            <div class="card-header"><h2 id="goalFormTitle">Nova meta</h2></div>
+            <form id="goalForm" novalidate>
+              <input type="hidden" id="goalId" />
+              <div class="form-group"><label for="goalName">Nome do objetivo</label><input id="goalName" type="text" required placeholder="Ex.: Viagem, curso, veículo" /></div>
+              <div class="form-group" style="margin-top:14px;"><label for="goalDescription">Descrição (opcional)</label><textarea id="goalDescription" rows="2" placeholder="Detalhes do objetivo"></textarea></div>
+              <div class="form-grid" style="margin-top:14px;">
+                <div class="form-group"><label for="goalTarget">Valor desejado</label><input id="goalTarget" type="number" min="0.01" step="0.01" required /></div>
+                <div class="form-group"><label for="goalSaved">Valor já reservado</label><input id="goalSaved" type="number" min="0" step="0.01" value="0" /></div>
+                <div class="form-group full"><label for="goalDate">Prazo desejado (opcional)</label><input id="goalDate" type="date" /></div>
+              </div>
+              <div class="form-actions"><button type="submit" class="primary-btn"><span id="goalSubmitText">Criar meta</span></button><button type="button" class="secondary-btn hidden" id="cancelGoalEdit">Cancelar edição</button></div>
+            </form>
+          </section>
+          <section class="content-card form-panel">
+            <div class="card-header"><h2>Movimentar uma caixinha</h2></div>
+            <form id="goalMovementForm" novalidate>
+              <div class="form-group"><label for="goalMovementTarget">Meta</label><select id="goalMovementTarget"></select></div>
+              <div class="form-group" style="margin-top:14px;"><label for="goalMovementAmount">Valor</label><input id="goalMovementAmount" type="number" min="0.01" step="0.01" required /></div>
+              <div class="form-actions" id="goalMovementActions"><button type="button" class="primary-btn" data-goal-operation="deposit">Adicionar</button><button type="button" class="secondary-btn" data-goal-operation="withdraw">Retirar</button></div>
+            </form>
+            <p class="inline-note">Adicionar ou retirar valores não cria receitas nem despesas no histórico financeiro.</p>
+          </section>
+        </div>
+        <section class="content-card"><div class="card-header"><h2>Suas metas</h2></div><div class="goal-list" id="goalList"></div></section>
+      </main>
+    </div>
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/goals.js"></script>
+  </body>
+</html>

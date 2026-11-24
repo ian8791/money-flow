@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow | Dicas de economia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-badge">MF</div><div class="brand-text">MoneyFlow</div></div>
+        <nav class="sidebar-nav"><a href="dashboard.html" class="nav-link"><span class="icon">📊</span>Dashboard</a></nav>
+        <div class="sidebar-footer">
+          <div class="user-mini"><div class="avatar" data-user-initials>U</div><div><strong data-user-name>Usuário</strong><small>Conta ativa</small></div></div>
+          <button class="secondary-btn" data-action="logout" style="width:100%;">Sair</button>
+        </div>
+      </aside>
+      <main class="main-panel">
+        <div class="topbar"><h1 class="page-title">Dicas de economia</h1><div class="topbar-actions"><button class="theme-toggle" data-theme-toggle aria-label="Alternar tema">☀️</button></div></div>
+        <div class="page-header-card"><div><h2>Educação financeira no dia a dia</h2><div class="summary-mini">Orientações gerais para organizar escolhas e acompanhar seu orçamento.</div></div></div>
+        <section class="content-card" style="margin-bottom:24px;"><div class="card-header"><h2>Análise dos seus registros</h2></div><p id="financialInsight" class="summary-mini" style="line-height:1.6;"></p><small class="inline-note">Sugestão automática com base nos dados salvos localmente; não é recomendação de investimento.</small></section>
+        <div class="tip-list" id="financialTips"></div>
+      </main>
+    </div>
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/tips.js"></script>
+  </body>
+</html>

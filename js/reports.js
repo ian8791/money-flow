@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('reportTitle')) {
+    document.getElementById('reportCategoryPeriod').addEventListener('change', renderExpenseCategoryReport);
+    initReportsPage();
+  }
+});
+
+window.addEventListener('moneyflow:data-changed', initReportsPage);
+window.addEventListener('storage', (event) => {
+  if ([STORAGE_KEYS.transactions, STORAGE_KEYS.categories].includes(event.key)) {
     initReportsPage();
   }
 });
@@ -16,21 +24,64 @@ function initReportsPage() {
   document.getElementById('reportExpenseValue').textContent = formatCurrency(summary.expense);
   document.getElementById('reportBalanceValue').textContent = formatCurrency(summary.balance);
 
-  buildLineChart('reportTrendChart', labels.slice(-6), incomeSeries.slice(-6), expenseSeries.slice(-6));
+  const monthDetails = monthlyData.slice(-6).map((item) => getMonthlyName(item.month));
+  buildLineChart('reportTrendChart', labels.slice(-6), incomeSeries.slice(-6), expenseSeries.slice(-6), monthDetails);
   buildBarChart('reportMonthlyComparison', labels.slice(-6), balanceSeries.slice(-6), ['#38bdf8', '#16c784', '#f59e0b', '#8b5cf6', '#ff5f6d', '#f97316']);
+  renderExpenseCategoryReport();
+  renderMonthlyReportTable(monthlyData.slice(-6));
+}
 
-  const categoryTotals = getExpenseCategoryTotals();
-  if (categoryTotals.length) {
-    buildDonutChart('reportCategoryChart', categoryTotals.map((item) => ({ value: item.value, color: item.color })));
+function renderExpenseCategoryReport() {
+  const period = document.getElementById('reportCategoryPeriod')?.value || '';
+  const categoryTotals = getExpenseCategoryTotals(period);
+  const chartCanvas = document.getElementById('reportCategoryChart');
+  const chartCard = chartCanvas?.closest('.chart-card');
 
-    const categoryChartCard = document.getElementById('reportCategoryChart').closest('.chart-card');
-    if (categoryChartCard) {
-      const legend = renderSimpleLegend(categoryTotals.map((item) => ({ label: item.name, color: item.color })));
-      categoryChartCard.appendChild(legend);
+  buildDonutChart('reportCategoryChart', categoryTotals.map((item) => ({
+    label: item.name,
+    value: item.value,
+    color: item.color
+  })));
+
+  if (chartCard) {
+    chartCard.querySelector('.legend')?.remove();
+    if (categoryTotals.length) {
+      chartCard.appendChild(renderSimpleLegend(categoryTotals.map((item) => ({
+        label: `${item.name} (${item.percentage.toFixed(1)}%)`,
+        color: item.color
+      }))));
     }
   }
 
-  renderMonthlyReportTable(monthlyData.slice(-6));
+  const tableBody = document.getElementById('reportCategoryTableBody');
+  if (!tableBody) {
+    return;
+  }
+
+  if (!categoryTotals.length) {
+    tableBody.innerHTML = '<tr><td colspan="3"><div class="empty-state">Sem despesas para o período selecionado.</div></td></tr>';
+    return;
+  }
+
+  tableBody.replaceChildren();
+  categoryTotals.forEach((category) => {
+    const row = document.createElement('tr');
+    const nameCell = document.createElement('td');
+    const swatch = document.createElement('span');
+    swatch.className = 'category-swatch';
+    swatch.style.cssText = 'display:inline-block;vertical-align:middle;margin-right:8px;';
+    swatch.style.background = category.color;
+    const name = document.createElement('span');
+    name.textContent = category.name;
+    nameCell.append(swatch, name);
+
+    const valueCell = document.createElement('td');
+    valueCell.textContent = formatCurrency(category.value);
+    const percentageCell = document.createElement('td');
+    percentageCell.textContent = `${category.percentage.toFixed(1)}%`;
+    row.append(nameCell, valueCell, percentageCell);
+    tableBody.appendChild(row);
+  });
 }
 
 function renderMonthlyReportTable(monthlyData) {
